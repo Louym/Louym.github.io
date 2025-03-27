@@ -1,114 +1,74 @@
-/* Reset basic styling */
-* {
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    background-color: #f4f4f9;
+    color: #333;
   }
   
-  /* Body Styling */
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4; /* Light grey background */
-    color: #333; /* Dark text for readability */
-    line-height: 1.6;
-    padding: 20px;
-  }
-  
-  /* Header Styling */
   header {
     text-align: center;
     padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
+    background-color: #949594;
+    color: rgb(109, 86, 86);
   }
   
-  /* Profile photo styling */
+  header h1 {
+    font-size: 2.5em;
+  }
+  
+  header p {
+    font-size: 1.2em;
+  }
+  
+  /* Styling for profile photo */
   .profile-photo {
     width: 150px;
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
+    border: 5px solid white;
+    margin-bottom: 20px;
+  }
+  
+  /* Section styles */
+  section {
+    margin: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    font-size: 1.8em;
     margin-bottom: 15px;
   }
   
-  /* About Section */
-  #about {
-    background-color: #ffffff;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  #about ul {
+  ul {
     list-style-type: none;
-    padding-left: 20px;
+    padding-left: 0;
   }
   
-  #about li {
-    margin-bottom: 8px;
+  ul li {
+    margin: 10px 0;
   }
   
-  /* Projects Section */
-  #projects {
-    background-color: #ffffff;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  #projects a {
-    color: #007BFF;
+  a {
+    color: #514c86;
     text-decoration: none;
   }
   
-  #projects a:hover {
+  a:hover {
     text-decoration: underline;
-  }
-  
-  /* Publications Section */
-  #pubs {
-    background-color: #ffffff;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  #pubs a {
-    color: #007BFF;
-    text-decoration: none;
-  }
-  
-  #pubs a:hover {
-    text-decoration: underline;
-  }
-  
-  /* Contact Section */
-  #contact {
-    background-color: #ffffff;
-    padding: 20px;
-    margin-bottom: 30px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  #contact a {
-    color: #007BFF;
-    text-decoration: none;
   }
   
   /* Footer */
   footer {
     text-align: center;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
-    color: #666;
+    padding: 10px;
+    background-color: #333;
+    color: white;
   }
   
