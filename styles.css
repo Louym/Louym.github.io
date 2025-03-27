@@ -1,57 +1,114 @@
-/* Basic styling for the website */
-
-body {
-    font-family: Arial, sans-serif;
+/* Reset basic styling */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
-    color: #333;
+    box-sizing: border-box;
   }
   
-  header {
-    background-color: #4CAF50;
-    color: white;
-    text-align: center;
-    padding: 50px 20px;
-  }
-  
-  h1 {
-    margin: 0;
-  }
-  
-  section {
+  /* Body Styling */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Light grey background */
+    color: #333; /* Dark text for readability */
+    line-height: 1.6;
     padding: 20px;
   }
   
-  h2 {
-    color: #4CAF50;
+  /* Header Styling */
+  header {
+    text-align: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
   }
   
-  ul {
+  /* Profile photo styling */
+  .profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  
+  /* About Section */
+  #about {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  #about ul {
     list-style-type: none;
-    padding-left: 0;
+    padding-left: 20px;
   }
   
-  li {
-    margin-bottom: 10px;
+  #about li {
+    margin-bottom: 8px;
   }
   
-  a {
+  /* Projects Section */
+  #projects {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  #projects a {
+    color: #007BFF;
     text-decoration: none;
-    color: #4CAF50;
   }
   
-  a:hover {
+  #projects a:hover {
     text-decoration: underline;
   }
   
+  /* Publications Section */
+  #pubs {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  #pubs a {
+    color: #007BFF;
+    text-decoration: none;
+  }
+  
+  #pubs a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Contact Section */
+  #contact {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  #contact a {
+    color: #007BFF;
+    text-decoration: none;
+  }
+  
+  /* Footer */
   footer {
     text-align: center;
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    color: #666;
   }
   
