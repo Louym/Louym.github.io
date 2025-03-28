@@ -88,14 +88,14 @@ body {
 
 /* 让图标居中排列 */
 .social-icons {
-  display: flex;
+  display: inline-block;
   justify-content: center;
   gap: 15px;
 }
 
 /* 图标样式 */
 .icon {
-  display: flex;
+  display: inline-block;
   justify-content: center;
   align-items: center;
   width: 40px;
