@@ -5,71 +5,120 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Yuming Lou - Personal Website</title>
+  <title>Yuming Lou - Princeton CS</title>
   <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
+
 <body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">Yuming Lou</a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#pubs">Publications</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <header>
-    <img src="photo.jpg" alt="Your Photo" class="profile-photo">
-    <h1>Yuming Lou</h1>
-    <p>Welcome to my personal website!</p>
+    <div class="header-content">
+      <img src="photo.jpg" alt="Yuming Lou" class="profile-photo">
+      <h1>Yuming Lou</h1>
+      <p class="subtitle">PhD Student @ Princeton CS</p>
+      <p class="intro-text">Efficient AI | Systems for ML | Algorithm-System Co-design</p>
+      
+      <div class="social-icons-header">
+        <a href="https://scholar.google.com/citations?hl=zh-EN&user=gSuP1RkAAAAJ" class="icon" target="_blank"><i class="fas fa-graduation-cap"></i></a>
+        <a href="https://github.com/Louym" class="icon" target="_blank"><i class="fab fa-github"></i></a>
+        <a href="https://x.com/YumingLou" class="icon" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="mailto:louym21@gmail.com" class="icon"><i class="fas fa-envelope"></i></a>
+      </div>
+    </div>
   </header>
 
-  <section id="about">
-    <h2>About Me</h2>
-    <p>I am a passionate PhD student at Princeton CS, advised by <a href="https://www.cs.princeton.edu/~li/" target="_blank">Professor Kai Li</a> and <a href="https://www.cs.princeton.edu/~ravian/" target="_blank">Professor Ravi Netravali</a>. Before that, I did my undergraduate at <a href="https://www.ee.tsinghua.edu.cn/en/" target="_blank">EE, Tsinghua University</a>. My work focuses on efficient AI, ranging from algorithm to system.</p>
-    <p>In the past, I am honored to work under the supervision of Professor <a href="http://nicsefc.ee.tsinghua.edu.cn/people/yu-wang/" target="_blank">Yu Wang</a> and <a href="http://web.ee.tsinghua.edu.cn/ningxuefei/en/index.htm" target="_blank">Xuefei Ning</a> at Tsinghua to explore quantization algorithm.</p>
-    <p>I am also honored to work as an intern at <a href="https://hanlab.mit.edu/" target="_blank">MIT HAN Lab</a>, under the supervision of <a href="https://hanlab.mit.edu/songhan" target="_blank"> Professor Song Han</a>, <a href="https://ys-2020.github.io/" target="_blank">Shang Yang</a> and <a href="http://kentang.net/" target="_blank">Haotian Tang</a> to explore efficient system designing for quantized LLMs. </p>
-    <p>I also collaborated closely with <a href="https://research.nvidia.com/person/yao-lu-jason" target="_blank">Jason Lu</a> from <a href="https://www.nvidia.com/research" target="_blank">Nvidia Research</a>.
-  </section>
+  <div class="main-container">
+    
+    <section id="about">
+      <h2>About Me</h2>
+      <p>I am a passionate PhD student at <strong>Princeton CS</strong>, advised by <a href="https://www.cs.princeton.edu/~li/" target="_blank">Professor Kai Li</a> and <a href="https://www.cs.princeton.edu/~ravian/" target="_blank">Professor Ravi Netravali</a>. Before that, I obtained my B.E. degree from <a href="https://www.ee.tsinghua.edu.cn/en/" target="_blank">EE, Tsinghua University</a>. My research focuses on <strong>efficient AI</strong>, spanning from algorithms to systems.</p>
+      
+      <p>Previously, I had the privilege of working under the supervision of Professor <a href="http://nicsefc.ee.tsinghua.edu.cn/people/yu-wang/" target="_blank">Yu Wang</a> and <a href="http://web.ee.tsinghua.edu.cn/ningxuefei/en/index.htm" target="_blank">Xuefei Ning</a> at Tsinghua on quantization algorithms.</p>
+      
+      <p>I also interned at <a href="https://hanlab.mit.edu/" target="_blank">MIT HAN Lab</a>, supervised by <a href="https://hanlab.mit.edu/songhan" target="_blank">Professor Song Han</a>, <a href="https://ys-2020.github.io/" target="_blank">Shang Yang</a>, and <a href="http://kentang.net/" target="_blank">Haotian Tang</a>, exploring efficient system design for quantized LLMs. I have also collaborated closely with <a href="https://research.nvidia.com/person/yao-lu-jason" target="_blank">Jason Lu</a> from <a href="https://www.nvidia.com/research" target="_blank">Nvidia Research</a>.</p>
+    </section>
 
-  <section id="projects">
-    <h2>Projects</h2>
-    <ul>
-      <li><a href="https://github.com/mit-han-lab/llm-awq.git" target="_blank">Project 1</a> - I contribute intensively and co-led TinyChat 2.0. </li>
-    </ul>
-  </section>
+    <section id="blog">
+      <h2>Blog & Updates</h2>
+      <div class="blog-list">
+        
+        <article class="blog-item">
+          <div class="blog-date">Jan 24, 2026</div>
+          <div class="blog-content">
+            <h3><a href="#">Setting up my research workflow</a></h3>
+            <p>Here I share some tools and scripts I use to manage experiments on the cluster...</p>
+          </div>
+        </article>
 
-  <section id="pubs">
-    <h2>Publications</h2>
-    <ul>
-      <li><a href="https://arxiv.org/abs/2412.04468" target="_blank">Liu, Z., Zhu, L., Shi, B., Zhang, Z., <strong>Lou Y.</strong>, et al. (2024). NVILA: Efficient Frontier Visual Language Models.</a></li>
-      <li><a href="https://hanlab.mit.edu/blog/tinychat20" target="_blank">Yang, S., <strong>Lou Y.</strong>, Guo, J., Tang, J., Tang, H., & Han, S. (2024). TinyChat 2.0: Accelerating Edge AI with Efficient LLM and VLM Deployment. MIT Han Lab.</a></li>
-      <li><a href="https://arxiv.org/abs/2404.14294" target="_blank">Zhou, Z., Ning, X., Hong, K., Fu, T., Xu, J., Li, S., <strong>Lou Y.</strong>, et al. (2024). A Survey on Efficient Inference for Large Language Models.</a></li>
-    </ul>
-  </section>
+        <article class="blog-item">
+          <div class="blog-date">Dec 15, 2025</div>
+          <div class="blog-content">
+            <h3><a href="#">Reflections on Efficient LLM Inference</a></h3>
+            <p>Some thoughts after reading recent papers on KV-cache compression...</p>
+          </div>
+        </article>
 
-  <section id="interest">
-    <h2>Interests</h2>
-    <ul>
-      <li>I enjoy a variety of sports, from badminton to basketball.</li>
-      <li>I'm also passionate about movies and TV series.</li>
-    </ul>
-  </section>
+      </div>
+    </section>
 
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Feel free to reach out to me through my <a href="mailto:louym21@gmail.com">email</a>.</p>
-    </div>
-  </section>
+    <section id="projects">
+      <h2>Selected Projects</h2>
+      <ul class="project-list">
+        <li>
+          <strong><a href="https://github.com/mit-han-lab/llm-awq.git" target="_blank">TinyChat 2.0</a></strong>
+          <p>Co-led the development. Accelerating Edge AI with Efficient LLM and VLM Deployment.</p>
+        </li>
+      </ul>
+    </section>
 
-  <section id="social">
-    <div class="social-icons">
-        <a href="https://scholar.google.com/citations?hl=zh-EN&user=gSuP1RkAAAAJ" class="icon">
-            <i class="fas fa-graduation-cap"></i>
-        </a>
-        <a href="https://github.com/Louym" class="icon">
-            <i class="fab fa-github"></i>
-        </a>
-        <a href="https://x.com/YumingLou" class="icon">
-            <i class="fab fa-twitter"></i>
-        </a>
-    </div>
-</section>
+    <section id="pubs">
+      <h2>Publications</h2>
+      <ul class="pub-list">
+        <li>
+          <span class="pub-title"><a href="https://arxiv.org/abs/2412.04468" target="_blank">NVILA: Efficient Frontier Visual Language Models</a></span><br>
+          Z. Liu, L. Zhu, B. Shi, Z. Zhang, <strong>Yuming Lou</strong>, et al.<br>
+          <span class="pub-venue">ArXiv 2024</span>
+        </li>
+        <li>
+          <span class="pub-title"><a href="https://hanlab.mit.edu/blog/tinychat20" target="_blank">TinyChat 2.0: Accelerating Edge AI with Efficient LLM and VLM Deployment</a></span><br>
+          S. Yang, <strong>Yuming Lou</strong>, J. Guo, J. Tang, H. Tang, & S. Han.<br>
+          <span class="pub-venue">MIT Han Lab Blog 2024</span>
+        </li>
+        <li>
+          <span class="pub-title"><a href="https://arxiv.org/abs/2404.14294" target="_blank">A Survey on Efficient Inference for Large Language Models</a></span><br>
+          Z. Zhou, X. Ning, K. Hong, T. Fu, J. Xu, S. Li, <strong>Yuming Lou</strong>, et al.<br>
+          <span class="pub-venue">ArXiv 2024</span>
+        </li>
+      </ul>
+    </section>
 
-  <footer>
-    <p>&copy; 2025 Yuming Lou. All rights reserved.</p>
+    <section id="interest">
+      <h2>Interests</h2>
+      <p>Outside of research, I enjoy a variety of sports (badminton, basketball) and am passionate about movies and TV series.</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Feel free to reach out via <a href="mailto:louym21@gmail.com">email</a>.</p>
+    </section>
+
+  </div> <footer>
+    <p>&copy; 2025 Yuming Lou.</p>
   </footer>
 </body>
 </html>
