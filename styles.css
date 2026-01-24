@@ -66,9 +66,25 @@ body {
 /* --- Header --- */
 header {
   text-align: center;
-  padding: 60px 20px;
-  background-color: var(--header-bg);
+  padding: 80px 20px; /* 稍微增加一点高度让背景展示更多 */
   color: white;
+  position: relative; /* 为了可能的后续定位做准备 */
+
+  /* --- 核心修改区域 --- */
+
+  /* 1. 设置背景图片 */
+  /* linear-gradient(...) 是为了加一层半透明的黑色遮罩(0.6即60%不透明度) */
+  /* 如果不加这一层，如果背景图太亮，白字就看不清了 */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('header-bg.jpg');
+
+  /* 2. 确保图片覆盖整个区域，不拉伸变形 */
+  background-size: cover;
+
+  /* 3. 图片居中显示 */
+  background-position: center center;
+
+  /* 4. 不重复平铺 */
+  background-repeat: no-repeat;
 }
 
 header h1 {
