@@ -75,7 +75,7 @@ header {
   /* 1. 设置背景图片 */
   /* linear-gradient(...) 是为了加一层半透明的黑色遮罩(0.6即60%不透明度) */
   /* 如果不加这一层，如果背景图太亮，白字就看不清了 */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('header-bg.jpg');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('images/header-bg.jpg');
 
   /* 2. 确保图片覆盖整个区域，不拉伸变形 */
   background-size: cover;
