@@ -34,6 +34,7 @@
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
         <article style="line-height: 1.8;">
+          <h3>1. Introduction</h3>
           <p>Long-context capability is pivotal for modern machine learning, particularly in natural language processing and time series analysis. However, maintaining context over extended sequences remains a bottleneck. As shown in the figure below, processing a long document with the <a href="https://arxiv.org/abs/2505.09388" target="_blank">Qwen3-4B</a> model leads to an explosion in KV cache usage.</p>
           <figure style="text-align: center; margin: 20px 0;">
             <img src="../blog/serving/TTT/images/kv_cache_edge_device.png" alt="KV Cache Growth" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
@@ -42,13 +43,46 @@
 
             <p>This contrasts sharply with biological intelligence. Unlike humans, whose hippocampus consolidates short-term working memory into long-term storage (often during sleep), LLMs rely solely on a growing raw buffer—the KV cache. Setting aside RAG (which acts more like an external notebook than an internal brain), I wonder if we can engineer a similar "memory consolidation" mechanism for LLMs. Specifically, can we leverage fine-tuning to compress history directly into model weights? By doing so, we could drastically reduce the KV cache footprint and improve inference speed. While training is computationally expensive, LLMs are not always active; we can potentially utilize the intervals between user queries—such as waiting for tool feedback or human response—to perform this optimization. This initial post explores the feasibility of this idea and the challenges that lie ahead.</p>
           
-          <h3>1. Managing Experiments</h3>
-          <p>I use a specific structure to organize my logs and checkpoints...</p>
+          <h3>2. Related Work</h3>
+          <p>
+        The challenge of long-context modeling has sparked a wide range of innovations. 
+        Broadly speaking, existing approaches fall into three categories: architectural redesigns, efficient attention mechanisms, and the emerging paradigm of test-time training.
+      </p>
+
+      <h4>Architectural Alternatives: Beyond Softmax Attention</h4>
+      <p>
+        A major line of work attempts to break the quadratic complexity of Transformer attention fundamentally. 
+        <strong>Linear Attention</strong> mechanisms and State Space Models (SSMs) like <a href="#" target="_blank">Mamba</a> and <a href="#" target="_blank">RWKV</a> compress history into a fixed-size state, achieving O(N) complexity. 
+        More recently, Google's <a href="#" target="_blank">Titans</a> introduced a "Neural Memory" module that learns to memorize historical context dynamically. 
+        While these models are efficient, they often require training from scratch or significant architectural changes, making them hard to apply directly to pre-trained LLMs like Llama or Qwen without retraining.
+      </p>
+
+      <h4>Sparse Attention & Cache Eviction</h4>
+      <p>
+        For standard Transformers, <strong>Sparse Attention</strong> methods aim to reduce the KV cache size by keeping only the "important" tokens. 
+        Works like <a href="#" target="_blank">StreamingLLM</a> and <a href="#" target="_blank">H2O</a> observe that attention is naturally sparse—we typically only need the "attention sinks" (initial tokens) and recent local context. 
+        While effective for keeping the model running indefinitely, these methods inevitably lose information. If the answer to a user's question lies in a "forgotten" middle part of the context, these models will fail to recall it.
+      </p>
+
+      <h4>The "Third Path": Test-Time Training (TTT)</h4>
+      <p>
+        This leads us to <strong>Test-Time Training (TTT)</strong>. Unlike the methods above, TTT adapts the model weights themselves during inference to fit the current input sequence. 
+        Historically explored in domain adaptation and computer vision (e.g., <a href="#" target="_blank">Sun et al.</a>), TTT allows the model to "learn" the current context rather than just "caching" it. 
+        Recently, <a href="#" target="_blank">TTT-LM</a> proposed replacing the RNN hidden state with a machine learning model (weights) that is updated on-the-fly. 
+        
+        My exploration aligns with this philosophy but asks a more specific question: 
+        <em>Can we use standard fine-tuning (e.g., LoRA) as a form of explicit memory consolidation for standard Transformers, turning the context window into long-term weight memory?</em>
+      </p>
           
-          <h3>2. Visualization Tools</h3>
+          <h3>3. Can model learn?</h3>
           <p>Recently I wrote some scripts to visualize the hidden states...</p>
 
-          <p><em>(You can write more HTML content here)</em></p>
+          <h3>4. What have model learnt?</h3>
+          <p>Recently I wrote some scripts to visualize the hidden states...</p>
+
+          <h3>5. Future Work</h3>
+          <p>There are several promising directions to explore:</p>
+
         </article>
         </div>
     </section>
