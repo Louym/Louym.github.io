@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Setting up Research Workflow - Yuming Lou</title>
+  <title>Test-Time Training for Long Context - Yuming Lou</title>
   <link rel="stylesheet" href="../styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -34,7 +34,10 @@
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
         <article style="line-height: 1.8;">
-          <p>This is my first blog post. Writing efficient code for experiments is crucial for a PhD student.</p>
+          <p>Long-context capability is pivotal for modern machine learning, particularly in natural language processing and time series analysis. However, maintaining context over extended sequences remains a bottleneck. As shown in the figure below, processing a long document with the Qwen3-4B model leads to an explosion in KV cache usage.
+
+            This contrasts sharply with biological intelligence. Unlike humans, whose hippocampus consolidates short-term working memory into long-term storage (often during sleep), LLMs rely solely on a growing raw buffer—the KV cache. Setting aside RAG (which acts more like an external notebook than an internal brain), I wonder if we can engineer a similar "memory consolidation" mechanism for LLMs. Specifically, can we leverage fine-tuning to compress history directly into model weights? By doing so, we could drastically reduce the KV cache footprint and improve inference speed. While training is computationally expensive, LLMs are not always active; we can potentially utilize the intervals between user queries—such as waiting for tool feedback or human response—to perform this optimization. This initial post explores the feasibility of this idea and the challenges that lie ahead.
+            </p>
           
           <h3>1. Managing Experiments</h3>
           <p>I use a specific structure to organize my logs and checkpoints...</p>
