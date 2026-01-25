@@ -52,16 +52,13 @@
             <h4>2.1 Architectural Alternatives & The "Capacity Limit"</h4>
             <p>
             One direction is to design new memory forms, often inspired by RNNs. 
-            <strong>Linear Attention</strong> mechanisms (like <a href="#" target="_blank">RWKV</a> or <a href="#" target="_blank">Mamba</a>) compress history into a fixed-size state, allowing for O(N) inference. 
-            Google's recent <a href="#" target="_blank">Titans</a> also introduces a "Neural Memory" module that explicitly manages memorization and forgetting.
+            <strong>Linear Attention</strong> mechanisms (like <a href="https://arxiv.org/abs/2305.13048" target="_blank">RWKV</a> or <a href="https://arxiv.org/abs/2312.00752" target="_blank">Mamba</a>) compress history into a fixed-size state, allowing for O(N) inference. 
+            Google's recent <a href="https://arxiv.org/abs/2501.00663" target="_blank">Titans</a> also introduces a "Neural Memory" module that explicitly manages memorization and forgetting.
             </p>
             <p>
-            However, these methods face a theoretical ceiling. As pointed out in <em>"Linear Transformers Are Secretly Fast Weight Programmers"</em>, linear attention stores information in a matrix and retrieves it via dot products. 
-            <strong>Crucially, effective retrieval requires the keys to be orthogonal.</strong> 
-            <br><br>
-            <em>"With keys embedded in a d-dimensional space, there cannot be more than d orthogonal vectors... Endlessly adding new associations inevitably will reach a limit."</em>
-            <br><br>
-            This implies that once the sequence length exceeds the dimension capacity (overcapacity regime), the model suffers from unavoidable retrieval errors due to interference. This explains why they often struggle with precision in "needle-in-a-haystack" tasks compared to full attention.
+            However, these methods face a theoretical ceiling. As pointed out in this <a href="https://arxiv.org/abs/2102.11174" target="_blank">paper</a>, linear attention stores information in a matrix and retrieves it via dot products. 
+            Crucially, effective retrieval requires the keys to be orthogonal.
+            This implies that once the sequence length exceeds the dimension capacity (overcapacity regime), the model suffers from unavoidable retrieval errors due to interference. This explains why they often struggle with long context.
             </p>
 
             <h4>2.2 KV Cache Optimization: Pruning & Sparsity</h4>
@@ -70,25 +67,25 @@
             </p>
             <ul>
             <li>
-                <strong>Cache Eviction (Reducing Space):</strong> Methods like <a href="#" target="_blank">SnapKV</a>, <a href="#" target="_blank">H2O</a>, and <a href="#" target="_blank">StreamingLLM</a> identify and evict "unimportant" tokens to keep the cache size constant. While this accelerates inference and saves memory, it is inherently lossy—if the answer lies in an evicted token, the model hallucinates.
+                <strong>Cache Eviction (Reducing Space):</strong> Methods like <a href="https://arxiv.org/abs/2404.14469" target="_blank">SnapKV</a>, <a href="#" target="_blank">H2O</a>, and <a href="https://arxiv.org/abs/2309.17453" target="_blank">StreamingLLM</a> identify and evict "unimportant" tokens to keep the cache size constant. While this accelerates inference and saves memory, it is inherently lossy—if the answer lies in an evicted token, the model hallucinates.
             </li>
             <li>
-                <strong>Sparse Attention (Accelerating Compute):</strong> Other methods select only the top-K relevant tokens for calculation (e.g., <a href="#" target="_blank">Sparse Transformer</a>). While this speeds up the attention operation, it doesn't necessarily reduce the memory footprint if the full cache still needs to be stored for selection.
+                <strong>Sparse Attention (Accelerating Compute):</strong> Other methods select only the top-K relevant tokens for calculation (e.g., <a href="https://arxiv.org/abs/2508.07101" target="_blank">Less Is More</a>). While this speeds up the attention operation, it doesn't necessarily reduce the memory footprint if the full cache still needs to be stored for selection.
             </li>
             </ul>
 
             <h4>2.3 Test-Time Training (TTT): The "Third Path"</h4>
             <p>
-            This brings us to <strong>Test-Time Training (TTT)</strong>. Analogous to the human brain, TTT allows the model to "learn" (update weights) from the context on-the-fly. 
-            Recently, <a href="#" target="_blank">TTT-LM (Sun et al.)</a> proposed an End-to-End (E2E) architecture where the hidden state is replaced by a learnable model. By optimizing a specific loss, they achieved performance superior to linear attention.
+            This brings us to Test-Time Training (TTT). Analogous to the human brain, TTT allows the model to "learn" (update weights) from the context on-the-fly. 
+            Recently, <a href="https://arxiv.org/abs/2512.23675" target="_blank">TTT-E2E </a> achieve to outperform linear attention trough test-time training. Specifically, they modify model architecture, optimize the training loss and train a model from scratch.
             </p>
             <p>
-            <strong>However, TTT-LM requires pre-training a novel architecture from scratch.</strong> This is computationally expensive and discards the massive knowledge embedded in existing open-source models (like Llama-3 or Qwen).
+            However, TTT-E2E requires pre-training a novel architecture from scratch. This is computationally expensive and discards the massive knowledge embedded in existing open-source models.
             </p>
             <p>
-            <strong>My Hypothesis:</strong> 
-            <em>Can we leverage the TTT capability inherent in <strong>existing</strong> frozen LLMs?</em> 
-            Instead of designing a new TTT model, can we use fine-tuning (e.g., LoRA) on the context as a form of "episodic memory," thereby compressing the KV cache into weights without needing to pre-train a new model?
+            My Hypothesis:
+            <em>Can we leverage the TTT capability inherent in existing frozen LLMs?</em> 
+            Instead of designing a new TTT model, can we directly use TTT for existing models, thereby save space and accelerate inference?
             </p>
           
           <h3>3. Can model learn?</h3>
