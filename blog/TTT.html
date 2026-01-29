@@ -36,13 +36,27 @@
         <article style="line-height: 1.8;">
           <h3>1. Introduction</h3>
           <p>Long-context capability is pivotal for modern machine learning, particularly in natural language processing and time series analysis. However, maintaining context over extended sequences remains a bottleneck. As shown in the figure below, processing a long document with the <a href="https://arxiv.org/abs/2505.09388" target="_blank">Qwen3-4B</a> model leads to an explosion in KV cache usage.</p>
-          <figure style="text-align: center; margin: 20px 0;">
-            <img src="../blog/serving/TTT/images/kv_cache_edge_device.png" alt="KV Cache Growth" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
-            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;">Figure: KV cache growth when processing long documents with Qwen3-4B.</figcaption>
-          </figure>     
+          <figure style="text-align: center; margin: 30px 0;">
+            <img src="../blog/serving/TTT/images/kv_cache_edge_device.png" 
+                alt="KV Cache Growth" 
+                style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+                
+            <figcaption style="font-size: 0.95em; color: #555; margin-top: 12px; line-height: 1.5;">
+              <strong>Figure 1:</strong> KV cache growth when processing long documents with Qwen3-4B.
+            </figcaption>
+          </figure>
 
             <p>This contrasts sharply with biological intelligence. Unlike humans, whose hippocampus consolidates short-term working memory into long-term storage (often during sleep), LLMs rely solely on a growing raw buffer—the KV cache. Setting aside RAG (which acts more like an external notebook than an internal brain), I wonder if we can engineer a similar "memory consolidation" mechanism for LLMs. Specifically, can we leverage fine-tuning to compress history directly into model weights? By doing so, we could drastically reduce the KV cache footprint and improve inference speed. While training is computationally expensive, LLMs are not always active; we can potentially utilize the intervals between user queries—such as waiting for tool feedback or human response—to perform this optimization. This initial post explores the feasibility of this idea and the challenges that lie ahead.</p>
-          
+          <figure style="text-align: center; margin: 30px 0;">
+            <img src="../blog/serving/TTT/images/hippocampus.png" 
+                alt="Comparison diagram showing hippocampus memory consolidation vs. LLM test-time training" 
+                style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+                
+            <figcaption style="font-size: 0.95em; color: #555; margin-top: 12px; line-height: 1.5;">
+              <strong>Figure 2:</strong> Like the hippocampus, test-time training consolidates short-term memory (KV cache) into long-term storage within the model weights.
+            </figcaption>
+          </figure>
+
           <h3>2. Related Work: The Landscape of Long Context</h3>
             <p>
             To tackle the "memory wall" in LLMs, researchers have explored three main directions. 
@@ -88,10 +102,16 @@
             Instead of designing a new TTT model, can we directly use TTT for existing models, thereby save space and accelerate inference?
             </p>
           
-          <h3>3. Can model learn?</h3>
-          <p>Recently I wrote some scripts to visualize the hidden states...</p>
-
-          <h3>4. What have model learnt?</h3>
+          <h3>3. Can the model learn?</h3>
+          <p>One of the main problems of TTT is that when training the model with the long context, we want the model to learn the token sequence, while models possibly are learning the distribution instead. That is, we want the model to memorize specific sequences rather than generalize from them. Therefore, it is necessary to validate TTT.</p>
+          <p>To test this, I set up a simple experiment using Qwen3-4B. I use my own version of Needle-In-A-Haystack(NIAH), whose detailed design is shown below.</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="../blog/serving/TTT/images/NIAH_design.png" alt="NIAH Setting" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;">Figure: My NIAH experiment design.</figcaption>
+          </figure>
+          <p>In this experiment, I train the model with the needle and haystack sequences. And then, the model is provided with merely the question, asking to recall the needle sequence from the haystack. I choose different training configurations to observe the model's learning behavior, including LoRA and full fine-tuning.</p>
+          TODO: QKVO VS MLP, Longer Context
+          <h3>4. What have the model learnt?</h3>
           <p>Recently I wrote some scripts to visualize the hidden states...</p>
 
           <h3>5. Future Work</h3>
