@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Test-Time Training for Long Context - Yuming Lou</title>
+  <meta name="description" content="Results and insights on managing long context in large language models through test-time training: consolidating the KV cache into model weights.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="../styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
 
@@ -29,7 +31,7 @@
       
       <div style="margin-top: 20px;">
         <h1 style="font-size: 2em; margin-bottom: 10px;">Test-Time Training for Long Context</h1>
-        <p style="color: #888; font-style: italic;">Posted on Jan 24, 2026</p>
+        <p style="color: #888; font-style: italic;">Posted on Jan 24, 2026 · Updated with experiment results on Jul 7, 2026</p>
         
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
@@ -37,8 +39,9 @@
           <h3>1. Introduction</h3>
           <p>Long-context capability is pivotal for modern machine learning, particularly in natural language processing and time series analysis. However, maintaining context over extended sequences remains a bottleneck. As shown in the figure below, processing a long document with the <a href="https://arxiv.org/abs/2505.09388" target="_blank">Qwen3-4B</a> model leads to an explosion in KV cache usage.</p>
           <figure style="text-align: center; margin: 30px 0;">
-            <img src="../blog/serving/TTT/images/kv_cache_edge_device.png" 
-                alt="KV Cache Growth" 
+            <img src="serving/TTT/images/kv_cache_edge_device.webp"
+                alt="KV Cache Growth"
+                width="1600" height="1000" loading="lazy"
                 style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
                 
             <figcaption style="font-size: 0.95em; color: #555; margin-top: 12px; line-height: 1.5;">
@@ -48,8 +51,9 @@
 
             <p>This contrasts sharply with biological intelligence. Unlike humans, whose hippocampus consolidates short-term working memory into long-term storage (often during sleep), LLMs rely solely on a growing raw buffer—the KV cache. Setting aside RAG (which acts more like an external notebook than an internal brain), I wonder if we can engineer a similar "memory consolidation" mechanism for LLMs. Specifically, can we leverage fine-tuning to compress history directly into model weights? By doing so, we could drastically reduce the KV cache footprint and improve inference speed. While training is computationally expensive, LLMs are not always active; we can potentially utilize the intervals between user queries—such as waiting for tool feedback or human response—to perform this optimization. This initial post explores the feasibility of this idea and the challenges that lie ahead.</p>
           <figure style="text-align: center; margin: 30px 0;">
-            <img src="../blog/serving/TTT/images/hippocampus.png" 
-                alt="Comparison diagram showing hippocampus memory consolidation vs. LLM test-time training" 
+            <img src="serving/TTT/images/hippocampus.webp"
+                alt="Comparison diagram showing hippocampus memory consolidation vs. LLM test-time training"
+                width="1024" height="741" loading="lazy"
                 style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
                 
             <figcaption style="font-size: 0.95em; color: #555; margin-top: 12px; line-height: 1.5;">
@@ -81,7 +85,7 @@
             </p>
             <ul>
             <li>
-                <strong>Cache Eviction (Reducing Space):</strong> Methods like <a href="https://arxiv.org/abs/2404.14469" target="_blank">SnapKV</a>, <a href="#" target="_blank">H2O</a>, and <a href="https://arxiv.org/abs/2309.17453" target="_blank">StreamingLLM</a> identify and evict "unimportant" tokens to keep the cache size constant. While this accelerates inference and saves memory, it is inherently lossy—if the answer lies in an evicted token, the model hallucinates.
+                <strong>Cache Eviction (Reducing Space):</strong> Methods like <a href="https://arxiv.org/abs/2404.14469" target="_blank">SnapKV</a>, <a href="https://arxiv.org/abs/2306.14048" target="_blank">H2O</a>, and <a href="https://arxiv.org/abs/2309.17453" target="_blank">StreamingLLM</a> identify and evict "unimportant" tokens to keep the cache size constant. While this accelerates inference and saves memory, it is inherently lossy—if the answer lies in an evicted token, the model hallucinates.
             </li>
             <li>
                 <strong>Sparse Attention (Accelerating Compute):</strong> Other methods select only the top-K relevant tokens for calculation (e.g., <a href="https://arxiv.org/abs/2508.07101" target="_blank">Less Is More</a>). While this speeds up the attention operation, it doesn't necessarily reduce the memory footprint if the full cache still needs to be stored for selection.
@@ -91,7 +95,7 @@
             <h4>2.3 Test-Time Training (TTT): The "Third Path"</h4>
             <p>
             This brings us to Test-Time Training (TTT). Analogous to the human brain, TTT allows the model to "learn" (update weights) from the context on-the-fly. 
-            Recently, <a href="https://arxiv.org/abs/2512.23675" target="_blank">TTT-E2E </a> achieve to outperform linear attention trough test-time training. Specifically, they modify model architecture, optimize the training loss and train a model from scratch.
+            Recently, <a href="https://arxiv.org/abs/2512.23675" target="_blank">TTT-E2E</a> achieves better performance than linear attention through test-time training. Specifically, they modify the model architecture, optimize the training loss and train a model from scratch.
             </p>
             <p>
             However, TTT-E2E requires pre-training a novel architecture from scratch. This is computationally expensive and discards the massive knowledge embedded in existing open-source models.
@@ -99,23 +103,112 @@
             <p>
             <strong>My Hypothesis:</strong>
             Can we leverage the TTT capability inherent in existing frozen LLMs? 
-            Instead of designing a new TTT model, can we directly use TTT for existing models, thereby save space and accelerate inference?
+            Instead of designing a new TTT model, can we directly use TTT for existing models, thereby saving memory and accelerating inference?
             </p>
           
           <h3>3. Can the model learn?</h3>
           <p>One of the main problems of TTT is that when training the model with the long context, we want the model to learn the token sequence, while models possibly are learning the distribution instead. That is, we want the model to memorize specific sequences rather than generalize from them. Therefore, it is necessary to validate TTT.</p>
           <p>To test this, I set up a simple experiment using Qwen3-4B. I use my own version of Needle-In-A-Haystack(NIAH), whose detailed design is shown below.</p>
           <figure style="text-align: center; margin: 20px 0;">
-            <img src="../blog/serving/TTT/images/NIAH_design.png" alt="NIAH Setting" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
-            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;">Figure: My NIAH experiment design.</figcaption>
+            <img src="serving/TTT/images/NIAH_design.webp" alt="NIAH Setting" width="1600" height="901" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 3:</strong> My NIAH experiment design.</figcaption>
           </figure>
           <p>In this experiment, I train the model with the needle and haystack sequences. And then, the model is provided with merely the question, asking to recall the needle sequence from the haystack. I choose different training configurations to observe the model's learning behavior, including LoRA and full fine-tuning.</p>
-          TODO: QKVO VS MLP, Longer Context
+          <p>All experiments below use <strong>Qwen3-4B-Instruct-2507</strong>: for each NIAH instance I fine-tune the last 4 layers for 100 epochs (chunk size 4096, lr 2e-4), then ask the retrieval question <em>without any context in the prompt</em>. Each cell reports exact-match recall over 10 sampled generations.</p>
+
+          <h4>3.1 Sanity check: retrieval from the KV cache is easy</h4>
+          <p>First, the standard NIAH setting where the haystack stays in the prompt. The model retrieves the needle almost perfectly from 1k all the way to 256k tokens, so any failure in the experiments below is attributable to the in-weights memory, not the task.</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/niah_incontext_baseline.webp" alt="NIAH heatmap with context in prompt: near-perfect recall" width="1600" height="960" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 4:</strong> In-context baseline. Recall is near-perfect at every length and depth.</figcaption>
+          </figure>
+
+          <h4>3.2 Full fine-tuning works — but only below ~8k tokens</h4>
+          <p>Fully fine-tuning the MLPs of the last 4 layers can consolidate the needle into the weights: recall is strong at 1k–4k. But it degrades sharply at 8k and is essentially zero from 16k onward. With a uniform language-modeling loss, the needle is a ~10-token span inside an N-token context — as N grows, the gradient signal pointing at the needle gets diluted away.</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/niah_ttt_ft_mlp.webp" alt="NIAH heatmap, TTT via full fine-tuning of MLP: works up to 4k" width="1600" height="960" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 5:</strong> TTT via full fine-tuning of the last-4-layer MLPs. In-weights recall works at short lengths, then falls off a cliff.</figcaption>
+          </figure>
+
+          <h4>3.3 LoRA learns the loss but recalls nothing</h4>
+          <p>The same experiment with rank-16 LoRA on the MLPs produces a striking result: <strong>recall is 0.0 in every single cell</strong>, even at 1k tokens where the training loss converges close to zero. The adapter is clearly learning <em>something</em> — Section 4 investigates what.</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/niah_ttt_lora_mlp_r16.webp" alt="NIAH heatmap, TTT via LoRA r16 on MLP: all zeros" width="1600" height="960" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 6:</strong> TTT via rank-16 LoRA on the same MLPs: zero recall everywhere.</figcaption>
+          </figure>
+
+          <h4>3.4 QKVO vs MLP: facts live in the MLPs</h4>
+          <p>Is the choice of <em>which</em> modules to adapt important? I repeated both settings on the attention projections (Q, K, V, O) instead of the MLPs. The contrast is clear: full fine-tuning of QKVO only recalls at 1k (and only at some depths), and rank-16 LoRA on QKVO does not even reach a low training loss — recall is zero everywhere. This matches the knowledge-editing literature (e.g., <a href="https://arxiv.org/abs/2202.05262" target="_blank">ROME</a>): transformer MLPs act as key–value memories where factual associations are stored, while attention mainly routes information.</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/niah_ttt_ft_qkvo.webp" alt="NIAH heatmap, TTT via full fine-tuning of QKVO: only some recall at 1k" width="1600" height="960" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 7:</strong> Full fine-tuning of QKVO (last 4 layers): far weaker than MLP fine-tuning at every length.</figcaption>
+          </figure>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/niah_ttt_lora_qkvo_r16.webp" alt="NIAH heatmap, TTT via LoRA r16 on QKVO: all zeros" width="1600" height="960" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 8:</strong> Rank-16 LoRA on QKVO: zero recall everywhere, like its MLP counterpart.</figcaption>
+          </figure>
+
+          <h4>3.5 Is LoRA's failure just capacity? Partially.</h4>
+          <p>Raising the LoRA rank from 16 to 256 (on the MLPs) does change the picture, but not by much on the strict exact-match metric: only scattered non-zero cells at short lengths. The interesting part is in the model's responses — the rank-256 model often recalls a <em>prefix</em> of the passkey and then loses the tail, e.g. answering <code>cRiCPXCEbAx0</code> for the true passkey <code>cRiCPXCEbAx0HUAk</code>. The memory is there, but the reconstruction is lossy and unstable. Capacity gates how <em>reliably</em> the fact can be written into the adapter, and rank 256 sits right at the edge for this task.</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/niah_ttt_lora_mlp_r256.webp" alt="NIAH heatmap, TTT via LoRA r256 on MLP" width="1600" height="960" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 9:</strong> Rank-256 LoRA on the MLPs: mostly zero under exact match, with sporadic partial recall at short lengths.</figcaption>
+          </figure>
+
+          <h4>3.6 The longer-context wall</h4>
+          <p>Across every configuration — LoRA or full fine-tuning, MLP or QKVO — in-weights recall dies somewhere between 4k and 16k tokens, while the same model retrieves perfectly from its KV cache at 256k. I see two compounding causes. First, <em>signal dilution</em>: with a uniform LM loss, the needle's share of the gradient shrinks linearly with context length. Second, <em>interference</em>: longer contexts mean more chunks per epoch, and sequential updates on unrelated haystack text can overwrite the just-written needle association. Naive TTT therefore does not yet replace the KV cache at scale — which is exactly what makes this direction interesting.</p>
+
           <h3>4. What have the model learnt?</h3>
-          <p>Recently I wrote some scripts to visualize the hidden states...</p>
+          <p>The all-zero LoRA heatmap begs a question: if the training loss converges, what did the adapter actually learn? I probed each fine-tuned model (2k-token context, needle at 50% depth) with four tests of increasing "semantic distance" from the training data:</p>
+          <ul>
+            <li><strong>Needle NLL</strong> — per-token loss on the needle inside the context: did it memorize the sequence?</li>
+            <li><strong>Verbatim continuation</strong> — given the context right before the needle, does greedy decoding reproduce it?</li>
+            <li><strong>Cued completion</strong> — given <em>"The special passkey is '"</em>, does it complete the passkey?</li>
+            <li><strong>QA recall</strong> — the semantic question, with no context at all.</li>
+          </ul>
+          <div style="overflow-x: auto;">
+          <table style="border-collapse: collapse; width: 100%; font-size: 0.92em; margin: 15px 0;">
+            <thead>
+              <tr style="border-bottom: 2px solid #ddd; text-align: left;">
+                <th style="padding: 6px 10px;">Configuration</th>
+                <th style="padding: 6px 10px;">Needle NLL ↓</th>
+                <th style="padding: 6px 10px;">Verbatim</th>
+                <th style="padding: 6px 10px;">Cued</th>
+                <th style="padding: 6px 10px;">QA recall</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #eee;"><td style="padding: 6px 10px;">base (no TTT)</td><td style="padding: 6px 10px;">8.10</td><td style="padding: 6px 10px;">✗</td><td style="padding: 6px 10px;">✗</td><td style="padding: 6px 10px;">0.0</td></tr>
+              <tr style="border-bottom: 1px solid #eee; background: #fff8ec;"><td style="padding: 6px 10px;"><strong>LoRA-MLP r16</strong></td><td style="padding: 6px 10px;"><strong>0.18</strong></td><td style="padding: 6px 10px;"><strong>✓</strong></td><td style="padding: 6px 10px;"><strong>✓</strong></td><td style="padding: 6px 10px;"><strong>0.0</strong></td></tr>
+              <tr style="border-bottom: 1px solid #eee;"><td style="padding: 6px 10px;">LoRA-QKVO r16</td><td style="padding: 6px 10px;">3.80</td><td style="padding: 6px 10px;">✗</td><td style="padding: 6px 10px;">✗</td><td style="padding: 6px 10px;">0.0</td></tr>
+              <tr style="border-bottom: 1px solid #eee;"><td style="padding: 6px 10px;">LoRA-MLP r256</td><td style="padding: 6px 10px;">0.0004</td><td style="padding: 6px 10px;">✓</td><td style="padding: 6px 10px;">✓</td><td style="padding: 6px 10px;">0.6</td></tr>
+              <tr style="border-bottom: 1px solid #eee;"><td style="padding: 6px 10px;">Full FT MLP</td><td style="padding: 6px 10px;">0.0000</td><td style="padding: 6px 10px;">✓</td><td style="padding: 6px 10px;">✓</td><td style="padding: 6px 10px;">1.0</td></tr>
+              <tr><td style="padding: 6px 10px;">Full FT QKVO</td><td style="padding: 6px 10px;">0.0001</td><td style="padding: 6px 10px;">✓</td><td style="padding: 6px 10px;">✓</td><td style="padding: 6px 10px;">0.6</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p>The rank-16 MLP LoRA row is the key finding of this post: the adapter drives the needle's NLL to 0.18, reproduces the needle verbatim from a positional cue, and completes the passkey from its prefix — <strong>yet scores exactly zero on the semantic question</strong>. TTT with a plain LM loss stores the context as a <em>sequence</em>, retrievable only by sequential cues, not as a <em>fact</em>, retrievable by meaning. Memorization and retrievability are different capabilities, and the second one is what long-context inference actually needs.</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/ttt_recall_vs_memorization.webp" alt="Bar chart: QA recall vs cued/verbatim recall and needle NLL per configuration" width="1600" height="889" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 10:</strong> Memorization vs retrieval across configurations (2k tokens, depth 50%).</figcaption>
+          </figure>
+          <p>To see <em>where</em> the fact becomes accessible, I apply a logit lens: at the answer position of the QA prompt, I project every layer's hidden state through the final norm and LM head, and track the probability of the passkey's first token. In the base model the fact never appears. In the fine-tuned models it emerges only in the last four layers — exactly the layers TTT was allowed to touch — and the height it reaches cleanly separates the configurations that can answer the question (full-FT MLP, LoRA r256 reach p≈1) from those that cannot (LoRA r16 stalls at p≈0.003).</p>
+          <figure style="text-align: center; margin: 20px 0;">
+            <img src="serving/TTT/images/ttt_logit_lens.webp" alt="Logit lens curves per layer for each configuration" width="1600" height="889" loading="lazy" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px;">
+            <figcaption style="font-size: 0.9em; color: #666; margin-top: 5px;"><strong>Figure 11:</strong> Logit lens at the answer position. The memorized fact only becomes linearly readable in the fine-tuned last 4 layers, and only for the configurations with enough capacity.</figcaption>
+          </figure>
+          <p>Two caveats worth stating. I repeated the probe on three random NIAH instances: the central result is fully stable (rank-16 LoRA memorizes but scores 0.0 QA recall in all three; full-FT MLP scores 1.0 in all three; rank-256 stays at 0.4–0.6), while full-FT QKVO is genuinely brittle, swinging between 0.0 and 0.6 across instances — consistent with its near-empty heatmap in Figure 7. Second, aggressive TTT is not free: after 100 epochs the fully fine-tuned model answers the question correctly but then degrades into repetitive junk tokens, a reminder that consolidating memory this way erodes general behavior.</p>
 
           <h3>5. Future Work</h3>
-          <p>There are several promising directions to explore:</p>
+          <p>These results reframe the problem: the bottleneck is not getting information <em>into</em> the weights, but making it <em>retrievable by meaning</em> — and doing so at lengths beyond a few thousand tokens. Several directions follow naturally:</p>
+          <ul>
+            <li><strong>Train for retrieval, not prediction.</strong> A uniform LM loss teaches sequence continuation. Generating QA pairs or summaries from the context and training on those (the model rehearsing its own memory, much like the hippocampus replays experiences during sleep) should directly optimize the retrieval path.</li>
+            <li><strong>Salience-weighted consolidation.</strong> Up-weight the loss on informative spans (rare tokens, entities, high-surprisal regions) to fight the signal dilution that kills recall beyond 8k.</li>
+            <li><strong>Fight interference at length.</strong> Replay/rehearsal schedules over chunks, or consolidating hierarchically (chunk summaries first, details on demand), instead of a single uniform pass over a 256k stream.</li>
+            <li><strong>Hybrid memory.</strong> Keep a short recent-window KV cache and consolidate only older history into weights — the biological analogy suggests working memory and long-term memory should coexist, not replace each other.</li>
+            <li><strong>Preserving the base model.</strong> Regularize TTT (e.g. a KL anchor to the base model) so consolidation stops corroding general capabilities.</li>
+            <li><strong>Real workloads and systems questions.</strong> Move beyond synthetic NIAH to LongBench-style tasks, and measure the end-to-end trade-off: TTT costs training FLOPs during idle time but saves KV-cache memory and prefill latency at every subsequent query.</li>
+          </ul>
 
         </article>
         </div>
@@ -124,7 +217,7 @@
   </div>
 
   <footer>
-    <p>&copy; 2025 Yuming Lou.</p>
+    <p>&copy; 2026 Yuming Lou.</p>
   </footer>
 
 </body>
